@@ -19,9 +19,7 @@ class RacketActor extends FragmentActor[RacketFragment] with ActorLogging {
   import RacketActor._
   import FragmentActor._
 
-  var lastOpponent: Option[ActorRef] = None
-
-  // receiveUi handles attaching and detaching UI
+  var lastOpponent: Option[ActorRef] = None// receiveUi handles attaching and detaching UI
   // and then (sic!) passes the message to us
   def receive = receiveUi andThen {
     case Ball ⇒

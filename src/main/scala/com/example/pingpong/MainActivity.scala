@@ -1,9 +1,11 @@
 package com.example.pingpong
 
 import android.os.Bundle
-import android.widget.LinearLayout
+import android.view.{View, Gravity}
+import android.widget.{EditText, TextView, LinearLayout}
 import android.view.ViewGroup.LayoutParams._
 import android.support.v4.app.FragmentActivity
+import macroid.contrib.TextTweaks
 
 // import macroid stuff
 import macroid._
@@ -19,6 +21,10 @@ class MainActivity extends FragmentActivity with Contexts[FragmentActivity] with
   lazy val ping = actorSystem.actorOf(RacketActor.props, "ping")
   lazy val pong = actorSystem.actorOf(RacketActor.props, "pong")
 
+  val centerView = Tweak[LinearLayout] { view ⇒
+    view.setGravity(Gravity.CENTER_HORIZONTAL)
+  }
+
   override def onCreate(savedInstanceState: Bundle) = {
     super.onCreate(savedInstanceState)
 
@@ -28,18 +34,22 @@ class MainActivity extends FragmentActivity with Contexts[FragmentActivity] with
     // layout params
     val lps = lp[LinearLayout](MATCH_PARENT, WRAP_CONTENT, 1.0f)
 
+
+
     // include the two fragments
     val view = l[LinearLayout](
       // we pass a name for the actor, and id+tag for the fragment
       f[RacketFragment].pass("name" → "ping").framed(Id.ping, Tag.ping) <~ lps,
-      f[RacketFragment].pass("name" → "pong").framed(Id.pong, Tag.pong) <~ lps
-    ) <~ vertical
+      f[RacketFragment].pass("name" → "pong").framed(Id.pong, Tag.pong) <~ lps,
+      w[EditText] <~  text("Write something now in the middle")
+    ) <~ vertical <~ centerView
 
     setContentView(getUi(view))
   }
 
   override def onStart() = {
     super.onStart()
+
 
     // start the game
     ping.tell(RacketActor.Ball, pong)
